@@ -1,5 +1,3 @@
-import copy as _copy
-
 import numpy as np
 
 
@@ -27,7 +25,7 @@ class CSF():
         self.indlen = np.zeros(self.ndim, dtype=np.intp)
 
         # The indices of the last mode can simply be copied.
-        self.indices[-1] = _copy.deepcopy(coo.coords[self.ndim-1])
+        self.indices[-1] = np.array(coo.coords[-1])
 
         # The first mode is easier than internal ones.
         self.indlen[0] = self.shape[0]
