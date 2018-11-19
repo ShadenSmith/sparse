@@ -15,12 +15,8 @@ class CSF():
         self._build_csf_tree(coo)
 
     def _build_csf_tree(self, coo):
-        # Sort the non-zeros. This could be conditionally removed as sparse.COO
-        # sorts by default.
-        coo._sort_indices()
-
         # The values can be copied directly.
-        self.data = _copy.deepcopy(coo.data)
+        self.data = np.array(coo.data)
 
         # Defines the sparsity structure of the sparse tensor. `indptrs` is not
         # needed for the last mode.
@@ -28,18 +24,15 @@ class CSF():
         self.indices = [0] * self.ndim
 
         # The length of indptrs.
-        self.indlen = np.zeros(self.ndim, dtype=coo.coords[0].dtype)
+        self.indlen = np.zeros(self.ndim, dtype=np.intp)
 
         # The indices of the last mode can simply be copied.
-        self.indices[self.ndim-1] = _copy.deepcopy(coo.coords[self.ndim-1])
+        self.indices[-1] = _copy.deepcopy(coo.coords[self.ndim-1])
 
         # The first mode is easier than internal ones.
         self.indlen[0] = self.shape[0]
-        self.indptrs[0] = np.zeros(self.shape[0] + 1, dtype=coo.coords[0].dtype)
-        self.indices[0] = np.zeros(self.shape[0], dtype=coo.coords[0].dtype)
-
-        # XXX: above, indptr should have its own (possibly different) type.    There
-        # is no guarantee that the `indices` type is large enough.
+        self.indptrs[0] = np.zeros(self.shape[0] + 1, dtype=np.intp)
+        self.indices[0] = np.zeros(self.shape[0], dtype=np.intp)
 
         # Scan through the indices and find the bounds of each slice.
         nnz_ptr = 0
@@ -66,8 +59,8 @@ class CSF():
 
             # Allocate storage
             self.indlen[mode] = num_fibs
-            self.indptrs[mode] = np.zeros((num_fibs+1), dtype=coo.coords[mode].dtype)
-            self.indices[mode] = np.zeros(num_fibs, dtype=coo.coords[mode].dtype)
+            self.indptrs[mode] = np.zeros((num_fibs+1), dtype=np.intp)
+            self.indices[mode] = np.zeros(num_fibs, dtype=np.intp)
 
             # save typing
             indptr = self.indptrs[mode]
