@@ -1,3 +1,4 @@
+import numpy as np
 from sparse import COO
 from sparse import CSF
 from sparse.utils import assert_eq
@@ -15,5 +16,14 @@ def test_coo_to_csf():
     csf = CSF(coo)
 
     assert(coo.ndim == csf.ndim)
+    assert_eq(csf.indptrs[0], np.array([0, 2, 3]))
+    assert_eq(csf.indices[0], np.array([0, 1]))
+
+    assert_eq(csf.indptrs[1], np.array([0, 1, 3, 4]))
+    assert_eq(csf.indices[1], np.array([0, 1, 1]))
+
+    assert_eq(csf.indptrs[2], np.array([0, 2, 4, 5, 8]))
+    assert_eq(csf.indices[2], np.array([0, 0, 1, 1]))
+
     assert_eq(coo.data, csf.data)
     assert_eq(coo.coords[coo.ndim-1], csf.indices[csf.ndim-1])
